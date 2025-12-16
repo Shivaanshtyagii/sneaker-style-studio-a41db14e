@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Save, RotateCcw, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input'; // Added Input import
 import { ColorPicker } from './ColorPicker';
 import { MaterialToggle } from './MaterialToggle';
 import { AIDesignerDialog } from './AIDesignerDialog';
@@ -117,6 +118,20 @@ export const CustomizerSidebar = () => {
               </AnimatePresence>
             </div>
           ))}
+        </div>
+
+        {/* Personalize Section (New) */}
+        <div className="space-y-3 pt-4 border-t border-border">
+          <label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            Personalize
+          </label>
+          <Input
+            placeholder="Enter text (e.g. YOUR NAME)"
+            maxLength={10}
+            value={config.customText || ''}
+            onChange={(e) => setConfig({ customText: e.target.value })}
+            className="bg-secondary border-border"
+          />
         </div>
 
         {/* Material Toggle */}

@@ -8,7 +8,8 @@ interface SneakerSVGProps {
 }
 
 export const SneakerSVG = ({ config, className = '', animate = true }: SneakerSVGProps) => {
-  const { sole, upper, laces, logo, material } = config;
+  // 1. Destructure customText here so we can use it
+  const { sole, upper, laces, logo, material, customText } = config;
   const isShiny = material === 'shiny';
 
   return (
@@ -93,6 +94,28 @@ export const SneakerSVG = ({ config, className = '', animate = true }: SneakerSV
           animate={animate ? { opacity: 1 } : undefined}
           transition={animate ? { duration: 0.3, delay: 0.5 } : undefined}
         />
+
+        {/* 2. Text Engraving Section - Renders only if customText exists */}
+        {customText && (
+          <motion.text
+            x="280"
+            y="145"
+            fill={sole} // Uses sole color for nice contrast/coordination
+            fontSize="14"
+            fontWeight="bold"
+            textAnchor="end"
+            style={{ 
+              fontFamily: 'Arial, sans-serif', 
+              filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.3))',
+              letterSpacing: '1px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {customText}
+          </motion.text>
+        )}
 
         {/* Shiny overlay */}
         {isShiny && (

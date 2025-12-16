@@ -6,7 +6,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,78 +15,51 @@ serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+      throw new Error("GEMINI_API_KEY is missing");
     }
 
-    // Define the system instruction for the style
-    const systemPrompt = `You are a sneaker designer AI. Based on the user's mood, theme, or style description, generate a color scheme for a sneaker.
+    // UPDATED: Using 'gemini-flash-latest' which is the standard stable model
+    console.log("Using Model: gemini-flash-latest");
 
-    You MUST respond with ONLY a valid JSON object in this exact format, no other text:
-    {
-      "sole": "#hexcolor",
-      "upper": "#hexcolor", 
-      "laces": "#hexcolor",
-      "logo": "#hexcolor"
-    }
+    const systemPrompt = `You are a sneaker designer. Return a JSON object for a sneaker color scheme. 
+    Format: { "sole": "#hex", "upper": "#hex", "laces": "#hex", "logo": "#hex" }
+    Do not use Markdown. Return ONLY the raw JSON string.`;
 
-    Rules:
-    - All colors must be valid 6-digit hex codes starting with #
-    - Choose colors that work well together and match the described mood
-    - Be creative but ensure good contrast and visibility
-    - The logo should be visible against the upper color`;
-
-    // Call Gemini API directly
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{
             parts: [{ text: systemPrompt + "\n\nUser Request: " + prompt }]
-          }],
-          // Force JSON response to ensure we get clean data
-          generationConfig: {
-            responseMimeType: "application/json"
-          }
+          }]
         }),
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
-      throw new Error(`Gemini API returned ${response.status}: ${errorText}`);
+      console.error("Gemini API Error Body:", errorText);
+      throw new Error(`Gemini API Failed (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
-    
-    // Extract the text from Gemini's response structure
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    let content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
-      throw new Error("No content in AI response");
+      throw new Error("AI returned no content");
     }
 
-    // Parse the JSON string into an object
+    // Clean markdown
+    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+
     let colors;
     try {
       colors = JSON.parse(content);
     } catch (e) {
       console.error("JSON Parse Error:", content);
-      throw new Error("AI returned invalid JSON format");
-    }
-
-    // Validate the keys exist
-    const requiredKeys = ["sole", "upper", "laces", "logo"];
-    for (const key of requiredKeys) {
-      if (!colors[key] || !/^#[0-9A-Fa-f]{6}$/.test(colors[key])) {
-        // Fallback for invalid colors if necessary, or throw error
-        console.warn(`Invalid color for ${key}, using fallback`);
-        colors[key] = "#000000"; 
-      }
+      throw new Error("Failed to parse AI response as JSON");
     }
 
     return new Response(
@@ -96,9 +68,9 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("AI Designer error:", error);
+    console.error("Edge Function Error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown Error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

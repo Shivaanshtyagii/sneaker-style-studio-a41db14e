@@ -6,6 +6,7 @@ export interface SneakerConfig {
   laces: string;
   logo: string;
   material: 'matte' | 'shiny';
+  customText?: string; // <--- ADD THIS
 }
 
 interface CustomizerState {
@@ -28,6 +29,7 @@ const defaultConfig: SneakerConfig = {
   laces: '#000000',
   logo: '#00a8ff',
   material: 'matte',
+  customText: '', // <--- ADD THIS
 };
 
 export const useCustomizerStore = create<CustomizerState>((set) => ({

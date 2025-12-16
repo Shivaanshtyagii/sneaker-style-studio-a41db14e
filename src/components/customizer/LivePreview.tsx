@@ -1,22 +1,50 @@
 import { motion } from 'framer-motion';
+import { Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
+import { Button } from '@/components/ui/button';
 import { SneakerSVG } from '../sneaker/SneakerSVG';
 import { useCustomizerStore } from '@/stores/customizerStore';
 
 export const LivePreview = () => {
   const { config, productName, basePrice } = useCustomizerStore();
 
+  const handleDownload = async () => {
+    const element = document.getElementById('sneaker-preview-container');
+    if (element) {
+      try {
+        // Generate the image from the DOM element
+        const dataUrl = await toPng(element, { 
+          cacheBust: true, 
+          backgroundColor: '#ffffff',
+          style: { padding: '20px' } // Add some padding to the exported image
+        });
+        
+        // Create a fake link to trigger the download
+        const link = document.createElement('a');
+        link.download = `my-design-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+      } catch (err) {
+        console.error('Failed to download image', err);
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-background via-background to-secondary/20"
+      className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-background via-background to-secondary/20 relative"
     >
       {/* Background Grid */}
       <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-5 pointer-events-none" />
       
-      {/* Main Preview Area */}
-      <div className="relative z-10 w-full max-w-3xl">
+      {/* Main Preview Area - Wrapped with ID for capture */}
+      <div 
+        id="sneaker-preview-container" 
+        className="relative z-10 w-full max-w-3xl p-8 rounded-xl"
+      >
         {/* Product Info */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -83,6 +111,23 @@ export const LivePreview = () => {
           </span>
         </motion.div>
       </div>
+
+      {/* Download Button Positioned at Bottom Right */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="absolute bottom-8 right-8 z-20"
+      >
+        <Button 
+          variant="outline" 
+          onClick={handleDownload}
+          className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export Image
+        </Button>
+      </motion.div>
     </motion.div>
   );
 };
