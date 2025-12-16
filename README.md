@@ -2,8 +2,6 @@
 
 A modern, interactive web application that allows users to design, customize, and preview sneakers in real-time. Built as a technical assignment for the Frontend Developer Intern role.
 
-![Sneaker Studio Banner](https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2070&auto=format&fit=crop)
-
 ## 🚀 Live Demo & Test Credentials
 
 * **Live URL:** [Insert Your Vercel/Netlify Link Here]
