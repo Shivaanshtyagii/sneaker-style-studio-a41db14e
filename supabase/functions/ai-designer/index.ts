@@ -6,96 +6,87 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { prompt } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
+    // Define the system instruction for the style
     const systemPrompt = `You are a sneaker designer AI. Based on the user's mood, theme, or style description, generate a color scheme for a sneaker.
 
-You MUST respond with ONLY a valid JSON object in this exact format, no other text:
-{
-  "sole": "#hexcolor",
-  "upper": "#hexcolor", 
-  "laces": "#hexcolor",
-  "logo": "#hexcolor"
-}
+    You MUST respond with ONLY a valid JSON object in this exact format, no other text:
+    {
+      "sole": "#hexcolor",
+      "upper": "#hexcolor", 
+      "laces": "#hexcolor",
+      "logo": "#hexcolor"
+    }
 
-Rules:
-- All colors must be valid 6-digit hex codes starting with #
-- Choose colors that work well together and match the described mood
-- Be creative but ensure good contrast and visibility
-- The logo should be visible against the upper color`;
+    Rules:
+    - All colors must be valid 6-digit hex codes starting with #
+    - Choose colors that work well together and match the described mood
+    - Be creative but ensure good contrast and visibility
+    - The logo should be visible against the upper color`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
+    // Call Gemini API directly
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: systemPrompt + "\n\nUser Request: " + prompt }]
+          }],
+          // Force JSON response to ensure we get clean data
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Usage limit reached. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      throw new Error("AI gateway error");
+      console.error("Gemini API error:", response.status, errorText);
+      throw new Error(`Gemini API returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    
+    // Extract the text from Gemini's response structure
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
       throw new Error("No content in AI response");
     }
 
-    // Parse JSON from the response
+    // Parse the JSON string into an object
     let colors;
     try {
-      // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        colors = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
-      throw new Error("Invalid AI response format");
+      colors = JSON.parse(content);
+    } catch (e) {
+      console.error("JSON Parse Error:", content);
+      throw new Error("AI returned invalid JSON format");
     }
 
-    // Validate the colors object
+    // Validate the keys exist
     const requiredKeys = ["sole", "upper", "laces", "logo"];
     for (const key of requiredKeys) {
       if (!colors[key] || !/^#[0-9A-Fa-f]{6}$/.test(colors[key])) {
-        throw new Error(`Invalid color for ${key}`);
+        // Fallback for invalid colors if necessary, or throw error
+        console.warn(`Invalid color for ${key}, using fallback`);
+        colors[key] = "#000000"; 
       }
     }
 
@@ -103,6 +94,7 @@ Rules:
       JSON.stringify({ colors }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (error) {
     console.error("AI Designer error:", error);
     return new Response(
