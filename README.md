@@ -1,73 +1,60 @@
-# Welcome to your Lovable project
+# 👟 Sneaker Studio - Product Customizer
 
-## Project info
+A modern, interactive web application that allows users to design, customize, and preview sneakers in real-time. Built as a technical assignment for the Frontend Developer Intern role.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![Sneaker Studio Banner](https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2070&auto=format&fit=crop)
 
-## How can I edit this code?
+## 🚀 Live Demo & Test Credentials
 
-There are several ways of editing your application.
+* **Live URL:** [Insert Your Vercel/Netlify Link Here]
+* **GitHub Repo:** [Insert Your GitHub Link Here]
 
-**Use Lovable**
+### 🧪 Test Account
+To test the full functionality (Saving designs, Gallery, AI features), use these credentials:
+* **Email:** `demo@example.com`
+* **Password:** `password123`
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 👶 Explanation for a Kid
+Imagine a digital coloring book for sneakers! You can pick any colors you like for the laces, sole, and top. You can even write your name on the shoe. When you are done, you can save your special design to show your friends later!
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## ✨ Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### ✅ Core Requirements (Completed)
+* **Authentication:** Secure Login/Signup using Supabase Auth (Email/Password) with protected routes.
+* **Real-time Customization:** Interactive UI to change colors of specific parts (Sole, Upper, Laces, Logo).
+* **Material Toggle:** Switch between different textures (e.g., "Matte" vs. "Shiny").
+* **Personalization:** text engraving input to add a name or custom text to the sneaker.
+* **Live Preview:** Dynamic SVG-based preview with smooth Framer Motion animations.
+* **Export Design:** "Export Image" button to download high-resolution PNGs of the custom design.
+* **Design Gallery:** Save creations to the cloud (Supabase) and view/edit them later in a responsive grid.
 
-Follow these steps:
+### 🤖 Bonus Features (Completed)
+* **AI Designer:** Integrated **Google Gemini 2.0 Flash** to auto-generate creative color palettes based on natural language prompts (e.g., "Ocean vibe", "Cyberpunk", "Sunset").
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🛠️ Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+* **Frontend:** React, TypeScript, Vite
+* **Styling:** Tailwind CSS, Shadcn UI, Lucide React
+* **State Management:** Zustand
+* **Animations:** Framer Motion
+* **Data Fetching:** TanStack Query
+* **Backend & Auth:** Supabase (PostgreSQL, Auth, Row Level Security)
+* **AI Integration:** Google Gemini API (via Supabase Edge Functions)
+* **Image Generation:** html-to-image
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## ⚙️ Installation & Setup
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Follow these steps to run the project locally.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/your-username/sneaker-style-studio.git](https://github.com/your-username/sneaker-style-studio.git)
+cd sneaker-style-studio
