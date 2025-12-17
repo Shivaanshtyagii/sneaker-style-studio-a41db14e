@@ -4,13 +4,12 @@ A modern, interactive web application that allows users to design, customize, an
 
 ## 🚀 Live Demo & Test Credentials
 
-* **Live URL:** [Insert Your Vercel/Netlify Link Here]
-* **GitHub Repo:** [Insert Your GitHub Link Here]
+* **Live URL:** [https://sneaker-style-studio-a41db14e.vercel.app/]
 
 ### 🧪 Test Account
 To test the full functionality (Saving designs, Gallery, AI features), use these credentials:
-* **Email:** `demo@example.com`
-* **Password:** `password123`
+* **Email:** `sneakerstudio79@gmail.com`
+* **Password:** `123456`
 
 ---
 
